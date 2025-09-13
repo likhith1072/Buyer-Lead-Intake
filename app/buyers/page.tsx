@@ -4,6 +4,13 @@ import { useUser } from "@clerk/nextjs"
 
 function BuyersPage() {
      const { user, isLoaded, isSignedIn } = useUser()
+       if (!isLoaded) {
+    return <div>Loading...</div>
+  }
+
+  if (!isSignedIn) {
+    return <div>Not signed in</div>
+  }
   return (
     <div>
       <h1>Buyers Page</h1>

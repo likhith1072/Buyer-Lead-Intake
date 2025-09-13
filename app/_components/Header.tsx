@@ -10,8 +10,8 @@ function Header() {
 
   const {isSignedIn}=useUser();
   return (
-    <div className='flex items-center justify-between px-7 border shadow-sm'>
-      <div className="relative w-[90px] h-[90px]">
+    <div className='flex items-center justify-between px-7 border shadow-sm '>
+      <div className="relative w-[90px] h-[80px] ">
        <Image src={'/BuyerLeadLogo.png'}
         alt="Logo"
         fill
