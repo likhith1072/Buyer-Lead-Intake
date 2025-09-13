@@ -69,7 +69,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, id: newBuyerId }, { status: 201 });
   } catch (err) {
     console.error("POST /api/buyers error", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    if (err instanceof Error) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

@@ -84,7 +84,7 @@ export default function NewBuyerPage() {
     // Submit
     setSubmitting(true);
     try {
-      const res = await fetch("/api/buyers", {
+      const res = await fetch("/api/addBuyer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(parsed.data),

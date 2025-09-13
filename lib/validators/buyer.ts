@@ -1,4 +1,4 @@
-// lib/validators/buyer.ts
+
 import { z } from "zod";
 
 export const Cities = [
@@ -37,12 +37,12 @@ export const Statuses = [
 
 export const buyerBase = z.object({
   fullName: z.string().min(2).max(80),
-  email: z.string().email().optional().or(z.literal("")).transform((v) => (v === "" ? undefined : v)),
+  email: z.email({ message: "Invalid email" }).optional().or(z.literal("")).transform((v) => (v === "" ? undefined : v)),
   phone: z
     .string()
     .min(10)
     .max(15)
-    .regex(/^\d+$/, "Phone must be numeric (digits only)"),
+    .regex(/^\d+$/, { message: "Phone must be numeric (digits only)" }),
   city: z.enum(Cities),
   propertyType: z.enum(PropertyTypes),
   bhk: z
@@ -65,7 +65,7 @@ export const buyerCreateSchema = buyerBase.superRefine((val, ctx) => {
   if (["Apartment", "Villa"].includes(val.propertyType)) {
     if (!val.bhk || val.bhk === null || String(val.bhk).trim() === "") {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code:"custom", 
         message: "BHK is required for Apartment or Villa",
         path: ["bhk"],
       });
@@ -79,7 +79,7 @@ export const buyerCreateSchema = buyerBase.superRefine((val, ctx) => {
     val.budgetMax < val.budgetMin
   ) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom", 
       message: "budgetMax must be greater than or equal to budgetMin",
       path: ["budgetMax"],
     });

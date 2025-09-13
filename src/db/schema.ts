@@ -20,7 +20,6 @@ import {
 // });
 
 
-
 export const buyers = pgTable("buyers", {
   id: uuid("id").defaultRandom().primaryKey(),
   fullName: varchar("full_name", { length: 80 }).notNull(),
@@ -35,7 +34,7 @@ export const buyers = pgTable("buyers", {
   timeline: varchar("timeline", { length: 32 }).notNull(),
   source: varchar("source", { length: 32 }).notNull(),
   status: varchar("status", { length: 32 }).notNull().default("New"),
-  notes: text("notes"),
+  notes: varchar("notes", { length: 1000 }),
   tags: json("tags").$type<string[] | null>().default(null),
    // 👇 Clerk user.id stored as string
   ownerId: varchar("owner_id", { length: 255 }).notNull(),
@@ -46,7 +45,7 @@ export const buyers = pgTable("buyers", {
 export const buyer_history = pgTable("buyer_history", {
   id: uuid("id").defaultRandom().primaryKey(),
   buyerId: uuid("buyer_id").notNull(),
-    changedBy: varchar("changed_by", { length: 255 }).notNull(), // Clerk user.id
+  changedBy: varchar("changed_by", { length: 255 }).notNull(), // Clerk user.id
   changedAt: timestamp("changed_at").defaultNow().notNull(),
   diff: json("diff").$type<Record<string, any>>().notNull(), // JSON object describing changed fields
 });
