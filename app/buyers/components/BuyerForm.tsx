@@ -357,11 +357,11 @@ export default function BuyerForm({ buyer }: { buyer: Buyer }) {
 
           {/* Save button only in edit mode */}
           {editMode && isOwner && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                className="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {saving ? "Saving…" : "Save"}
               </button>

@@ -36,7 +36,7 @@ export default async function BuyerDetail({
       <BuyerForm buyer={buyer} />
 
       <div className="mt-8">
-        <h2 className="font-medium mb-2">Last 5 changes</h2>
+        <h2 className="font-semibold text-xl text-black mb-2 text-center w-full">Last 5 changes</h2>
         <ul className="space-y-2 text-sm">
           {history.map((h) => (
             <li key={h.id} className="border p-2 rounded">
