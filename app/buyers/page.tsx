@@ -73,7 +73,7 @@ export default async function BuyersPage({
   }
 
   return (
-    <div className=" mx-auto sm:px-4 px-2 py-2 w-full ">
+    <div className=" mx-auto sm:px-4 pt-2 mb-4 w-full ">
       <div className="flex flex-col items-center justify-between mb-4">
          <Link
         href="/buyers/new"

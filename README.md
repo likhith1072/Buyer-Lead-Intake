@@ -68,12 +68,12 @@ npm run dev
 - Error boundary + empty state  
 - Accessibility basics: labels, keyboard focus, form errors announced  
 - Basic full-text search on `fullName`, `email`, `notes`  
+- Simple rate limit on create/update (per user/IP)  
 
-**Skipped / Partial:**  
+**Skipped:**  
 - File upload for optional attachment  
 - Tag chips with typeahead  
-- Optimistic edit with rollback  
-- Simple rate limit on create/update (per user/IP)
+- Optimistic edit with rollback 
 
 
 

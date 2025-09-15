@@ -2,12 +2,27 @@ import { NextResponse } from "next/server";
 import { db } from "@/src/index";
 import { buyers } from "@/src/db/schema";
 import { and, eq, sql, SQL, asc, desc } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+
+    const user = await currentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Use user.id if logged in, fallback to IP
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown-ip";
+  const key = user.id ?? ip;
+
+  if (!checkRateLimit(key)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
 
     const search = url.searchParams.get("q") ?? "";
     const city = url.searchParams.get("city");

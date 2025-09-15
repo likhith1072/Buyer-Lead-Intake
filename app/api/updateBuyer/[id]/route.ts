@@ -5,6 +5,7 @@ import { buyerCreateSchema,BuyerCreateInput} from "@/lib/validators/buyer";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 import { v4 as uuidv4 } from "uuid";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,14 @@ export async function PUT(req: Request, {
     const user = await currentUser();
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
+      // Use user.id if logged in, fallback to IP
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown-ip";
+  const key = user.id ?? ip;
+
+  if (!checkRateLimit(key)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+  
     const { id } = await params;
     const body = await req.json();
     // Expect body to contain updated fields plus updatedAt for concurrency check

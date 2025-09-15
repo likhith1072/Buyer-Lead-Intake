@@ -27,7 +27,7 @@ export default async function BuyerDetail({
 
   return (
     <div className="container mx-auto px-4 py-6 relative">
-       <Link href="/buyers" className="absolute left-0 text-blue-600 hover:underline hover:text-blue-700 flex items-center gap-1">
+       <Link href="/buyers" className="absolute left-5 text-blue-600 hover:underline hover:text-blue-700 flex items-center gap-1">
           <ArrowLeft size={20} />
           Back
         </Link>

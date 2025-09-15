@@ -6,6 +6,7 @@ import { db } from "@/src/index";
 import { buyers, buyer_history } from "@/src/db/schema";
 import { buyerCreateSchema, BuyerCreateInput } from "@/lib/validators/buyer";
 import { v4 as uuidv4 } from "uuid";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,6 +14,14 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
+
+    // Use user.id if logged in, fallback to IP
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown-ip";
+  const key = user.id ?? ip;
+
+  if (!checkRateLimit(key)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
 
     const body = await req.json();
 
