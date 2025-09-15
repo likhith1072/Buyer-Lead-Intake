@@ -3,12 +3,9 @@ import {
   pgTable,
   uuid,
   varchar,
-  text,
   integer,
   timestamp,
-  boolean,
   json,
-  serial,
 } from "drizzle-orm/pg-core";
 
 // export const users = pgTable("users", {

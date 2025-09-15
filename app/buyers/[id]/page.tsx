@@ -1,4 +1,4 @@
-// app/buyers/[id]/page.tsx
+
 import { db } from "@/src/index";
 import { buyers, buyer_history } from "@/src/db/schema";
 import { eq, desc } from "drizzle-orm";

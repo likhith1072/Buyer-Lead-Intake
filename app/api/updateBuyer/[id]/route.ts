@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { db } from "@/src/index";
 import { buyers, buyer_history } from "@/src/db/schema";
 import { buyerCreateSchema, BuyerCreateInput } from "@/lib/validators/buyer";
