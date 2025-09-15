@@ -50,18 +50,18 @@ export default function NewBuyerPage() {
     setServerError(null);
 
     // build payload
-    const payload: any = {
+    const payload: BuyerCreateInput = {
       fullName: form.fullName ?? "",
       email: form.email ?? undefined,
       phone: form.phone ?? "",
-      city: form.city,
-      propertyType: form.propertyType,
+      city: form.city!,
+      propertyType: form.propertyType!,
       bhk: form.bhk,
-      purpose: form.purpose,
+      purpose: form.purpose!,
       budgetMin: form.budgetMin ? Number(form.budgetMin) : undefined,
       budgetMax: form.budgetMax ? Number(form.budgetMax) : undefined,
-      timeline: form.timeline,
-      source: form.source,
+      timeline: form.timeline!,
+      source: form.source!,
       notes: form.notes ?? undefined,
       tags: parseTags(form.tagsInput),
     };
@@ -82,6 +82,12 @@ export default function NewBuyerPage() {
       return;
     }
 
+    type ServerIssue = {
+  code: string;
+  message: string;
+  path?: (string | number)[];
+};
+
     // Submit
     setSubmitting(true);
     try {
@@ -97,7 +103,7 @@ export default function NewBuyerPage() {
         if (json?.issues) {
           // attach server-side issues to form
           const fieldErrors: Record<string, string> = {};
-          json.issues.forEach((iss: any) => {
+          json.issues.forEach((iss: ServerIssue) => {
             fieldErrors[iss.path?.[0] ?? "form"] = iss.message;
           });
           setErrors(fieldErrors);

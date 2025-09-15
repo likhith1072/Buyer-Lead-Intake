@@ -6,12 +6,13 @@ import { buyerCreateSchema, BuyerCreateInput } from "@/lib/validators/buyer";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { Trash2 } from "lucide-react";
+import { Buyer } from "@/src/db/schema";  
 
-type FormState = Partial<BuyerCreateInput> & {
+type FormState = Partial<Buyer> & {
   tagsInput?: string; // helper for comma-separated input
 };
 
-export default function BuyerForm({ buyer }: { buyer: any }) {
+export default function BuyerForm({ buyer }: { buyer: Buyer }) { 
   const router = useRouter();
   const { user } = useUser();
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/src/index";
 import { buyers, buyer_history } from "@/src/db/schema";
-import { buyerCreateSchema, BuyerCreateInput } from "@/lib/validators/buyer";
+import { buyerCreateSchema,BuyerCreateInput} from "@/lib/validators/buyer";
 import { eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 import { v4 as uuidv4 } from "uuid";
@@ -50,14 +50,16 @@ if (clientUpdatedAt !== serverUpdatedAt) {
 }
 
 
-
-
     const now = new Date();
 
     // compute diff (simple)
-    const diff: Record<string, any> = {};
+    type Diff<T> = Partial<
+  Record<keyof T, { old: T[keyof T]; new: T[keyof T] | undefined }>
+>;
+
+    const diff:  Diff<BuyerCreateInput> = {};
     (Object.keys(input) as (keyof typeof input)[]).forEach((k) => {
-  const oldVal = (existing as any)[k];
+  const oldVal = existing[k];
   const newVal = input[k];
 
   // deep compare arrays/objects

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Papa from "papaparse";
 import { toast } from "sonner";
-import { Upload} from "lucide-react";
+import { Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function ImportCSV() {
@@ -37,16 +37,23 @@ export default function ImportCSV() {
             setShowErrors(true);
           } else {
             toast.success(` Imported ${json.insertedCount} buyer leads successfully!`,
-  { position: "top-right" });
+              { position: "top-right" });
             if (json.errors?.length) {
               setErrors(json.errors);
               setShowErrors(true);
             }
-             router.refresh();
+            router.refresh();
           }
         } catch (err) {
-          setErrors([{ row: 0, message: "Network error" }]);
+          
+           if (err instanceof Error) {
+            setErrors([{ row: 0, message: err.message }]);
           setShowErrors(true);
+            toast.error(err.message, { position: "top-right" });
+          } else {
+            // fallback for unknown types
+            toast.error("An unexpected error occurred", { position: "top-right" });
+          }
         } finally {
           setUploading(false);
           if (fileInputRef.current) fileInputRef.current.value = ""; // reset file input
@@ -85,7 +92,7 @@ export default function ImportCSV() {
       {/* Errors section */}
       {errors.length > 0 && (
         <div className="mt-4 flex flex-col items-center justify-center">
-         
+
           <button
             type="button"
             className="text-sm font-medium text-red-600 hover:text-red-800 underline cursor-pointer"

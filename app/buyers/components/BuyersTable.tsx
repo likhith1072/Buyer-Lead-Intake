@@ -1,8 +1,9 @@
 // components/BuyersTable.tsx
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
+import { Buyer } from "@/src/db/schema";  
 
-export default async function BuyersTable({ items }: { items: any[] }) {
+export default async function BuyersTable({ items }: { items: Buyer[] }) {
   const user = await currentUser();
 
   return (
@@ -33,7 +34,7 @@ export default async function BuyersTable({ items }: { items: any[] }) {
               </td>
               <td className="px-3 py-2">{b.timeline}</td>
               <td className="px-3 py-2">{b.status}</td>
-              <td className="px-3 py-2">{new Date(b.updatedAt).toLocaleString()}</td>
+              <td className="px-3 py-2">{new Date(b.updatedAt!).toLocaleString()}</td>
               <td className="px-3 py-2">
                 <Link href={`/buyers/${b.id}`} className="text-blue-600 hover:underline">
                   {b.ownerId === user?.id ?"View/Edit" :"View"}

@@ -8,6 +8,8 @@ import {
   json,
 } from "drizzle-orm/pg-core";
 
+import { InferSelectModel } from "drizzle-orm";
+
 // export const users = pgTable("users", {
 //   id: uuid("id").defaultRandom().primaryKey(),
 //   email: varchar("email", { length: 255 }).notNull(),
@@ -38,11 +40,36 @@ export const buyers = pgTable("buyers", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Single field change type
+type FieldChange<T> = {
+  old?: T;
+  new?: T;
+};
+
+// Diff for updates: only changed fields
+type Diff<T> = Partial<Record<keyof T, FieldChange<T[keyof T]>>>;
+
+// History entry type: supports both create and update actions
+export type BuyerHistoryEntry =
+  | {
+      action: "create";
+      new: Buyer; // full object for created buyer
+    }
+  | {
+      action: "update";
+      changes: Diff<Buyer>; // only fields that changed
+    };
+
+
 
 export const buyer_history = pgTable("buyer_history", {
   id: uuid("id").defaultRandom().primaryKey(),
   buyerId: uuid("buyer_id").notNull(),
   changedBy: varchar("changed_by", { length: 255 }).notNull(), // Clerk user.id
   changedAt: timestamp("changed_at").defaultNow().notNull(),
-  diff: json("diff").$type<Record<string, any>>().notNull(), // JSON object describing changed fields
+  diff: json("diff").$type<BuyerHistoryEntry>().notNull(), // JSON object describing changed fields
 });
+
+
+
+export type Buyer = InferSelectModel<typeof buyers>;
