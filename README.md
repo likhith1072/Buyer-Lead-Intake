@@ -11,29 +11,29 @@ Password: Likhith@01082002
 **Setup**
 
 1.Clone the repo:
-``
+```
 git clone <repo-url>
 cd buyer-leads
-``
+```
 2.Install dependencies:
-``
+```
 npm install
-``
+```
 3.Create .env file with:
-``
+```
 DATABASE_URL='postgresql://<user>:<password>@<host>/<db>?sslmode=require&channel_binding=require'
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your_clerk_publishable_key>
 CLERK_SECRET_KEY=<your_clerk_secret_key>
 NODE_ENV=development
-``
+```
 4.Run database migrations:
-``
+```
 npm run db:migrate:dev
-``
+```
 5.Start the dev server:
-``
+```
 npm run dev
-``
+```
 
 **Design Notes**
 **Validation:**
