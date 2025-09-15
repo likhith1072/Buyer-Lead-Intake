@@ -1,14 +1,14 @@
-#Buyer Leads Mini App
+# **Buyer Leads Mini App**
 
 Live Demo: [https://your-vercel-deploy-link.vercel.app](https://buyer-lead-intake-red.vercel.app/)
 
-#Demo Login:
+## **Demo Login:**
 
 Email: likhithvarunsai@gmail.com
 
 Password: Likhith@01082002
 
-#Tech Stack
+## **Tech Stack**
 
 Frontend: Next.js, React, ESLint
 
@@ -23,7 +23,7 @@ Utilities: PapaParse (CSV parsing)
 Language / Tools: TypeScript
 
 
-#Setup
+## **Setup**
 
 1.Clone the repo:
 ```
@@ -50,7 +50,7 @@ npm run db:migrate:dev
 npm run dev
 ```
 
-# Design Notes
+## Design Notes
 
 **Validation:**  
 - Zod on both client and server ensures consistent validation for all forms (create/edit) and CSV imports.
