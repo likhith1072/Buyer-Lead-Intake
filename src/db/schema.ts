@@ -7,6 +7,7 @@ import {
   timestamp,
   json,
 } from "drizzle-orm/pg-core";
+import { BuyerCreateInput } from "@/lib/validators/buyer";
 
 import { InferSelectModel } from "drizzle-orm";
 
@@ -53,11 +54,11 @@ type Diff<T> = Partial<Record<keyof T, FieldChange<T[keyof T]>>>;
 export type BuyerHistoryEntry =
   | {
       action: "create";
-      new: Buyer; // full object for created buyer
+      new: BuyerCreateInput; // full object for created buyerCreateInput
     }
   | {
       action: "update";
-      changes: Diff<Buyer>; // only fields that changed
+      changes: Diff<BuyerCreateInput>; // only fields that changed
     };
 
 
