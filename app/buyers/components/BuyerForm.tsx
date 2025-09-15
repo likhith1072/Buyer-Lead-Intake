@@ -88,6 +88,7 @@ export default function BuyerForm({ buyer }: { buyer: Buyer }) {
 
     };
 
+    
     // validate with zod
     const parsed = buyerCreateSchema.safeParse(payload);
     if (!parsed.success) {
@@ -104,6 +105,13 @@ export default function BuyerForm({ buyer }: { buyer: Buyer }) {
       if (el) el.focus();
       return;
     }
+
+    interface ZodIssue {
+  code: string;
+  path: (string | number)[];
+  message: string;
+  // optional additional properties depending on the error type
+}
 
     const finalPayload = {
       ...parsed.data,
@@ -123,7 +131,7 @@ export default function BuyerForm({ buyer }: { buyer: Buyer }) {
         setServerError(json?.error ?? "Failed to save buyer");
         if (json?.issues) {
           const fieldErrors: Record<string, string> = {};
-          json.issues.forEach((iss: any) => {
+          json.issues.forEach((iss: ZodIssue) => {
             fieldErrors[iss.path?.[0] ?? "form"] = iss.message;
           });
           setErrors(fieldErrors);
