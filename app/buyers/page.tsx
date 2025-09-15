@@ -1,7 +1,7 @@
 
 import { db } from "@/src/index";
 import { buyers } from "@/src/db/schema";
-import { sql, and, eq } from "drizzle-orm";
+import { sql, SQL, and, eq } from "drizzle-orm";
 import ImportCSV from "./components/importCSV";
 import FiltersBar from "./components/FiltersBar";
 import BuyersTable from "./components/BuyersTable";
@@ -21,7 +21,7 @@ export default async function BuyersPage({
   const perPage = 10;
   const offset = (page - 1) * perPage;
 
-  const conditions: any[] = [];
+  const conditions: SQL[] = [];
   if (params.city && typeof params.city === "string") conditions.push(eq(buyers.city, params.city));
   if (params.propertyType && typeof params.propertyType === "string") conditions.push(eq(buyers.propertyType, params.propertyType));
   if (params.status && typeof params.status === "string") conditions.push(eq(buyers.status, params.status));

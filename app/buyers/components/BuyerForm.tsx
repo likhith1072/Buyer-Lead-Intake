@@ -8,7 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import { Trash2 } from "lucide-react";
 import { Buyer } from "@/src/db/schema";  
 
-type FormState = Partial<Buyer> & {
+type FormState = Partial<BuyerCreateInput> & {
   tagsInput?: string; // helper for comma-separated input
 };
 
@@ -20,8 +20,21 @@ export default function BuyerForm({ buyer }: { buyer: Buyer }) {
   const isOwner = buyer.ownerId === user?.id;
 
   // form state
-  const [form, setForm] = useState<FormState>({
-    ...buyer,
+   const [form, setForm] = useState<FormState>({
+    fullName: buyer.fullName,
+    email: buyer.email ?? undefined,
+    phone: buyer.phone,
+    city: buyer.city as BuyerCreateInput["city"], // cast to match union type
+    propertyType: buyer.propertyType as BuyerCreateInput["propertyType"],
+    bhk: buyer.bhk ?? undefined,
+    purpose: buyer.purpose as BuyerCreateInput["purpose"],
+    budgetMin: buyer.budgetMin ?? undefined,
+    budgetMax: buyer.budgetMax ?? undefined,
+    timeline: buyer.timeline as BuyerCreateInput["timeline"],
+    source: buyer.source as BuyerCreateInput["source"],
+    status: buyer.status as BuyerCreateInput["status"],
+    notes: buyer.notes ?? undefined,
+    tags: buyer.tags ?? undefined,
     tagsInput: buyer.tags?.join(", ") ?? "",
   });
 
@@ -57,21 +70,21 @@ export default function BuyerForm({ buyer }: { buyer: Buyer }) {
     setServerError(null);
 
     // build payload like in newForm
-    const payload: any = {
+    const payload: BuyerCreateInput = {
       fullName: form.fullName ?? "",
       email: form.email ?? undefined,
       phone: form.phone ?? "",
-      city: form.city,
-      propertyType: form.propertyType,
-      bhk: form.bhk,
-      purpose: form.purpose,
+      city: form.city as BuyerCreateInput["city"],
+      propertyType: form.propertyType as BuyerCreateInput["propertyType"],
+      bhk: form.bhk as BuyerCreateInput["bhk"],
+      purpose: form.purpose as BuyerCreateInput["purpose"],
       budgetMin: form.budgetMin ? Number(form.budgetMin) : undefined,
       budgetMax: form.budgetMax ? Number(form.budgetMax) : undefined,
-      timeline: form.timeline,
-      source: form.source,
+      timeline: form.timeline as BuyerCreateInput["timeline"],
+      source: form.source as BuyerCreateInput["source"],
       notes: form.notes ?? undefined,
       tags: parseTags(form.tagsInput),
-      status: form.status ?? buyer.status,
+      status: form.status ?? buyer.status as BuyerCreateInput["status"],
 
     };
 
