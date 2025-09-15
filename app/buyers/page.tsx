@@ -7,6 +7,7 @@ import FiltersBar from "./components/FiltersBar";
 import BuyersTable from "./components/BuyersTable";
 import Link from "next/link";
 import { Download } from "lucide-react";
+import { Plus } from "lucide-react";
 
 export const dynamic = "force-dynamic"; // SSR
 
@@ -51,6 +52,7 @@ export default async function BuyersPage({
   const totalPages = Math.ceil(total / perPage);
 
     // export link
+
   const exportUrl = `/api/exportBuyers?${new URLSearchParams(
     params as Record<string, string>
   ).toString()}`
@@ -72,7 +74,14 @@ export default async function BuyersPage({
 
   return (
     <div className=" mx-auto sm:px-4 px-2 py-2 w-full ">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col items-center justify-between mb-4">
+         <Link
+        href="/buyers/new"
+        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+      >
+        <Plus className="w-4 h-4 mr-2" />
+        Add New Buyer Lead
+      </Link>
         <ImportCSV />
         
       </div>
@@ -84,7 +93,7 @@ export default async function BuyersPage({
         className="sm:px-4 px-2 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 whitespace-nowrap flex items-center justify-center gap-1"
       > 
         <Download className="w-4 h-4" />
-        Export CSV
+        {/* {exporting ? "Exporting..." : "Export CSV"} */}Export CSV
       </Link>
       </div>
 

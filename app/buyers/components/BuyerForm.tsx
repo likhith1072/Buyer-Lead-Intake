@@ -1,74 +1,309 @@
-// components/BuyerForm.tsx
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { buyerCreateSchema, BuyerCreateInput } from "@/lib/validators/buyer";
 import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
+
+type FormState = Partial<BuyerCreateInput> & {
+  tagsInput?: string; // helper for comma-separated input
+};
 
 export default function BuyerForm({ buyer }: { buyer: any }) {
   const router = useRouter();
-  const [form, setForm] = useState({ ...buyer });
+  const { user } = useUser();
+
+  // check ownership
+  const isOwner = buyer.ownerId === user?.id;
+
+  // form state
+  const [form, setForm] = useState<FormState>({
+    ...buyer,
+    tagsInput: buyer.tags?.join(", ") ?? "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // edit mode toggle (default: view mode)
+  const [editMode, setEditMode] = useState(false);
+
+  function handleChange(
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) {
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, [name]: value }));
+    setErrors((e) => ({ ...e, [name]: "" }));
+  }
+
+  function parseTags(input?: string) {
+    if (!input) return undefined;
+    return input
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setServerError(null);
+
+    // build payload like in newForm
+    const payload: any = {
+      fullName: form.fullName ?? "",
+      email: form.email ?? undefined,
+      phone: form.phone ?? "",
+      city: form.city,
+      propertyType: form.propertyType,
+      bhk: form.bhk,
+      purpose: form.purpose,
+      budgetMin: form.budgetMin ? Number(form.budgetMin) : undefined,
+      budgetMax: form.budgetMax ? Number(form.budgetMax) : undefined,
+      timeline: form.timeline,
+      source: form.source,
+      notes: form.notes ?? undefined,
+      tags: parseTags(form.tagsInput),
+      status: form.status ?? buyer.status,
+     
+    };
+
+    // validate with zod
+    const parsed = buyerCreateSchema.safeParse(payload);
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const path = issue.path[0] ?? "form";
+        fieldErrors[String(path)] = issue.message;
+      });
+      setErrors(fieldErrors);
+      const firstKey = Object.keys(fieldErrors)[0];
+      const el = document.querySelector(
+        `[name="${firstKey}"]`
+      ) as HTMLElement | null;
+      if (el) el.focus();
+      return;
+    }
+
+    const finalPayload = {
+  ...parsed.data,
+  updatedAt: buyer.updatedAt ? new Date(buyer.updatedAt).toISOString() : undefined, // important to include
+};
+
     setSaving(true);
     try {
       const res = await fetch(`/api/updateBuyer/${buyer.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, updatedAt: buyer.updatedAt }),
+        body: JSON.stringify(finalPayload),
       });
+
+      const json = await res.json();
       if (!res.ok) {
-        const json = await res.json();
-        toast.error(json.error || "Failed to save");
-      } else {
-        toast.success("Saved!");
-        router.refresh();
+        setServerError(json?.error ?? "Failed to save buyer");
+        if (json?.issues) {
+          const fieldErrors: Record<string, string> = {};
+          json.issues.forEach((iss: any) => {
+            fieldErrors[iss.path?.[0] ?? "form"] = iss.message;
+          });
+          setErrors(fieldErrors);
+        }
+        setSaving(false);
+        return;
       }
-    } catch {
+
+      toast.success("Saved!");
+      setEditMode(false);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
       toast.error("Network error");
     } finally {
       setSaving(false);
     }
   }
 
+  const showBhk =
+    form.propertyType === "Apartment" || form.propertyType === "Villa";
+
+  const readonly = !editMode || !isOwner;
+
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <input
-        value={form.fullName || ""}
-        onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-        placeholder="Full name"
-        className="border rounded p-2"
-        required
-      />
-      <input
-        value={form.phone || ""}
-        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-        placeholder="Phone"
-        className="border rounded p-2"
-        required
-      />
-      <input
-        value={form.email || ""}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-        placeholder="Email"
-        className="border rounded p-2"
-      />
-      <input
-        value={form.city || ""}
-        onChange={(e) => setForm({ ...form, city: e.target.value })}
-        placeholder="City"
-        className="border rounded p-2"
-      />
-      {/* ...repeat for propertyType, bhk, purpose, budgetMin/Max, timeline, source, notes, tags, status */}
-      <button
-        type="submit"
-        disabled={saving}
-        className="col-span-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+    <div className="max-w-2xl mx-auto">
+      {/* Checkbox for edit/view mode if owner */}
+      {isOwner && (
+        <div className="flex items-center mb-4">
+          <input
+            id="editMode"
+            type="checkbox"
+            checked={editMode}
+            onChange={(e) => setEditMode(e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="editMode">Edit mode</label>
+        </div>
+      )}
+
+      <form
+        onSubmit={handleSubmit}
+        aria-describedby={serverError ? "server-error" : undefined}
+        className="space-y-4"
       >
-        {saving ? "Saving…" : "Save"}
-      </button>
-    </form>
+        {serverError && (
+          <div
+            id="server-error"
+            role="alert"
+            className="bg-red-100 text-red-800 p-3 rounded"
+          >
+            {serverError}
+          </div>
+        )}
+
+         <div>
+          <label className="block text-sm font-medium" htmlFor="fullName">Full name</label>
+          <input
+            id="fullName"
+            name="fullName"
+            value={form.fullName}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+            readOnly={readonly}
+          />
+          {errors.fullName && <p id="err-fullName" className="text-sm text-red-600">{errors.fullName}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium" htmlFor="phone">Phone</label>
+          <input
+            id="phone"
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+            inputMode="numeric"
+             readOnly={readonly}
+          />
+          {errors.phone && <p id="err-phone" className="text-sm text-red-600">{errors.phone}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium" htmlFor="email">Email (optional)</label>
+          <input
+            id="email"
+            name="email"
+            value={form.email ?? ""}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+             readOnly={readonly}
+          />
+          {errors.email && <p id="err-email" className="text-sm text-red-600">{errors.email}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="city">City</label>
+            <select id="city" name="city" value={form.city} onChange={handleChange} className="w-full border rounded p-2" disabled={readonly}>
+              <option>Chandigarh</option>
+              <option>Mohali</option>
+              <option>Zirakpur</option>
+              <option>Panchkula</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium" htmlFor="propertyType">Property Type</label>
+            <select id="propertyType" name="propertyType" value={form.propertyType} onChange={handleChange} className="w-full border rounded p-2" disabled={readonly}>
+              <option>Apartment</option>
+              <option>Villa</option>
+              <option>Plot</option>
+              <option>Office</option>
+              <option>Retail</option>
+            </select>
+          </div>
+        </div>
+
+        {showBhk && (
+          <div>
+            <label className="block text-sm font-medium" htmlFor="bhk">BHK</label>
+            <select id="bhk" name="bhk" value={form.bhk!} onChange={handleChange} className="w-full border rounded p-2" disabled={readonly}>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>Studio</option>
+            </select>
+            {errors.bhk && <p className="text-sm text-red-600">{errors.bhk}</p>}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="budgetMin">Budget Min (INR)</label>
+            <input id="budgetMin" 
+             type="number" name="budgetMin" value={String(form.budgetMin ?? "")} onChange={handleChange} className="w-full border rounded p-2" readOnly={readonly} />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium" htmlFor="budgetMax">Budget Max (INR)</label>
+            <input id="budgetMax" 
+             type="number" name="budgetMax" value={String(form.budgetMax ?? "")} onChange={handleChange} className="w-full border rounded p-2" readOnly={readonly} />
+            {errors.budgetMax && <p className="text-sm text-red-600">{errors.budgetMax}</p>}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="timeline">Timeline</label>
+            <select id="timeline" name="timeline" value={form.timeline} onChange={handleChange} className="w-full border rounded p-2" disabled={readonly}>
+              <option>0-3m</option>
+              <option>3-6m</option>
+              <option>{">6m"}</option>
+              <option>Exploring</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium" htmlFor="source">Source</label>
+            <select id="source" name="source" value={form.source} onChange={handleChange} className="w-full border rounded p-2" disabled={readonly}>
+              <option>Website</option>
+              <option>Referral</option>
+              <option>Walk-in</option>
+              <option>Call</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium" htmlFor="notes">Notes</label>
+          <textarea id="notes" name="notes" value={form.notes ?? ""} onChange={handleChange} rows={4} className="w-full border rounded p-2" maxLength={1000} readOnly={readonly} />
+          {errors.notes && <p className="text-sm text-red-600">{errors.notes}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium" htmlFor="tagsInput">Tags (comma separated)</label>
+          <input id="tagsInput" name="tagsInput" value={form.tagsInput ?? ""} onChange={handleChange} className="w-full border rounded p-2" readOnly={readonly} />
+        </div>
+
+        {/* Save button only in edit mode */}
+        {editMode && isOwner && (
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+          </div>
+        )}
+      </form>
+    </div>
   );
 }

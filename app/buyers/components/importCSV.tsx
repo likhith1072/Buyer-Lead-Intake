@@ -4,8 +4,10 @@ import { useState, useRef } from "react";
 import Papa from "papaparse";
 import { toast } from "sonner";
 import { Upload} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ImportCSV() {
+  const router = useRouter();
   const [errors, setErrors] = useState<{ row: number; message: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
@@ -39,6 +41,7 @@ export default function ImportCSV() {
               setErrors(json.errors);
               setShowErrors(true);
             }
+             router.refresh();
           }
         } catch (err) {
           setErrors([{ row: 0, message: "Network error" }]);

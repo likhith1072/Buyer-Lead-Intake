@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { buyerCreateSchema, BuyerCreateInput } from "@/lib/validators/buyer";
-import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+
 
 type FormState = Partial<BuyerCreateInput> & {
   tagsInput?: string; // comma-separated input helper
@@ -118,13 +119,14 @@ export default function NewBuyerPage() {
   const showBhk = form.propertyType === "Apartment" || form.propertyType === "Villa";
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">New Buyer</h1>
-        <Link href="/buyers" className="text-sm text-blue-600 hover:underline">
-          ← Back to Buyers
-        </Link>
-      </div>
+    <div className="max-w-2xl mx-auto my-2">
+     <div className="flex items-center justify-center relative mb-6 ">
+  <Link href="/buyers" className="absolute left-0 text-blue-600 hover:underline hover:text-blue-700 flex items-center gap-1">
+    <ArrowLeft size={20} />
+    Back
+  </Link>
+  <h1 className="text-2xl font-semibold">New Buyer</h1>
+</div>
 
       <form onSubmit={handleSubmit} aria-describedby={serverError ? "server-error" : undefined} className="space-y-4">
         {serverError && (
@@ -142,8 +144,7 @@ export default function NewBuyerPage() {
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
-            aria-invalid={!!errors.fullName}
-            aria-describedby={errors.fullName ? "err-fullName" : undefined}
+           
           />
           {errors.fullName && <p id="err-fullName" className="text-sm text-red-600">{errors.fullName}</p>}
         </div>
@@ -157,8 +158,6 @@ export default function NewBuyerPage() {
             onChange={handleChange}
             className="w-full border rounded p-2"
             required
-            aria-invalid={!!errors.phone}
-            aria-describedby={errors.phone ? "err-phone" : undefined}
             inputMode="numeric"
           />
           {errors.phone && <p id="err-phone" className="text-sm text-red-600">{errors.phone}</p>}
@@ -172,8 +171,6 @@ export default function NewBuyerPage() {
             value={form.email ?? ""}
             onChange={handleChange}
             className="w-full border rounded p-2"
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? "err-email" : undefined}
           />
           {errors.email && <p id="err-email" className="text-sm text-red-600">{errors.email}</p>}
         </div>
@@ -219,12 +216,14 @@ export default function NewBuyerPage() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium" htmlFor="budgetMin">Budget Min (INR)</label>
-            <input id="budgetMin" name="budgetMin" value={String(form.budgetMin ?? "")} onChange={handleChange} className="w-full border rounded p-2" />
+            <input id="budgetMin" 
+             type="number" name="budgetMin" value={String(form.budgetMin ?? "")} onChange={handleChange} className="w-full border rounded p-2" />
           </div>
 
           <div>
             <label className="block text-sm font-medium" htmlFor="budgetMax">Budget Max (INR)</label>
-            <input id="budgetMax" name="budgetMax" value={String(form.budgetMax ?? "")} onChange={handleChange} className="w-full border rounded p-2" />
+            <input id="budgetMax" 
+             type="number" name="budgetMax" value={String(form.budgetMax ?? "")} onChange={handleChange} className="w-full border rounded p-2" />
             {errors.budgetMax && <p className="text-sm text-red-600">{errors.budgetMax}</p>}
           </div>
         </div>
@@ -264,11 +263,11 @@ export default function NewBuyerPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60">
+          <button type="submit" disabled={isSubmitting} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
             {isSubmitting ? "Saving…" : "Save"}
           </button>
 
-          <Link href="/buyers" className="text-sm text-gray-600 hover:underline">
+          <Link href="/buyers" className="text-sm text-gray-700 hover:underline">
             Cancel
           </Link>
         </div>

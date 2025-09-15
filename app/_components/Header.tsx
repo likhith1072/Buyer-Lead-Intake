@@ -11,13 +11,14 @@ function Header() {
   const {isSignedIn}=useUser();
   return (
     <div className='flex items-center justify-between px-7 border shadow-sm '>
-      <div className="relative w-[90px] h-[80px] ">
+     <Link href="/" >
+     <div className="relative w-[120px] h-[70px] ">
        <Image src={'/BuyerLeadLogo.png'}
         alt="Logo"
         fill
         className='cursor-pointer object-cover'
         />
-        </div>
+        </div></Link> 
         {isSignedIn ?<UserButton  appearance={{
     elements: {
       userButtonAvatarBox: {
