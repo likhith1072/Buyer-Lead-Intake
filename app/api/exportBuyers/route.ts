@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/src/index";
 import { buyers } from "@/src/db/schema";
-import { and, eq, sql, asc, desc } from "drizzle-orm";
+import { and, eq, sql, SQL, asc, desc } from "drizzle-orm";
 
 export const runtime = "nodejs";
 
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     const sort = url.searchParams.get("sort") ?? "updatedAt";
     const order = url.searchParams.get("order") ?? "desc";
 
-    const whereClauses: any[] = [];
+    const whereClauses: SQL[] = [];
     if (city) whereClauses.push(eq(buyers.city, city));
     if (propertyType) whereClauses.push(eq(buyers.propertyType, propertyType));
     if (status) whereClauses.push(eq(buyers.status, status));
