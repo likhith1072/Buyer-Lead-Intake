@@ -20,8 +20,8 @@ Language / Tools: TypeScript
 
 1.Clone the repo:
 ```
-git clone <repo-url>
-cd buyer-leads
+git clone https://github.com/likhith1072/Buyer-Lead-Intake.git
+cd Buyer-Lead-Intake 
 ```
 2.Install dependencies:
 ```
