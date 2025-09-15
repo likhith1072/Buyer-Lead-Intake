@@ -36,7 +36,8 @@ export default function ImportCSV() {
             setErrors(json.errors || [{ row: 0, message: json.error }]);
             setShowErrors(true);
           } else {
-            toast.success(`✅ Imported ${json.insertedCount} buyers successfully!`);
+            toast.success(` Imported ${json.insertedCount} buyer leads successfully!`,
+  { position: "top-right" });
             if (json.errors?.length) {
               setErrors(json.errors);
               setShowErrors(true);
