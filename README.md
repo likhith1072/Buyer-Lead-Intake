@@ -1,6 +1,6 @@
 **Buyer Leads Mini App**
 
-Live Demo: https://your-vercel-deploy-link.vercel.app
+Live Demo: [https://your-vercel-deploy-link.vercel.app](https://buyer-lead-intake-red.vercel.app/)
 
 **Demo Login:**
 
