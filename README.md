@@ -8,6 +8,14 @@ Email: likhithvarunsai@gmail.com
 
 Password: Likhith@01082002
 
+**Teck Stack**
+Frontend: Next.js, React, ESLint
+Authentication: Clerk
+Database / ORM: PostgreSQL, Drizzle ORM
+Validation: Zod (client & server)
+Utilities: PapaParse (CSV parsing)
+Language / Tools: TypeScript
+
 **Setup**
 
 1.Clone the repo:
